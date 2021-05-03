@@ -25,6 +25,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -38,7 +40,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (location != null) {
             LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.clear();
+            //mMap.clear();
             mMap.addMarker(new MarkerOptions().position(userLocation).title(title));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 16));
         }
@@ -102,11 +104,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             List<Address> listAddresses = geocoder.getFromLocation(latLng.latitude,latLng.longitude,1);
 
             if (listAddresses!=null && listAddresses.size()>0){
-
+                if (listAddresses.get(0).getThoroughfare()!= null) {
+                    if (listAddresses.get(0).getSubThoroughfare()!= null) {
+                        address+=listAddresses.get(0).getSubThoroughfare() + " ";
+                    }
+                    address+= listAddresses.get(0).getThoroughfare();
+                }
             }
         }catch (Exception e){
             e.printStackTrace();
         }
-        mMap.addMarker(new MarkerOptions().position(latLng).title(address));
+
+        if (address.equals("")){
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyy-MM-dd");
+            address += sdf.format(new Date());
+
+        }
+            mMap.addMarker(new MarkerOptions().position(latLng).title(address));
+
     }
 }

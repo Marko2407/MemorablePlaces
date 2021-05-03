@@ -40,7 +40,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (location != null) {
             LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
-            //mMap.clear();
+            mMap.clear();
             mMap.addMarker(new MarkerOptions().position(userLocation).title(title));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 16));
         }
@@ -93,6 +93,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             } else {
                 ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
             }
+        } else {
+            Location placeLocation = new Location(LocationManager.GPS_PROVIDER);
+            placeLocation.setLatitude(MainActivity.locations.get(intent.getIntExtra("placeNumber",0)).latitude);
+            placeLocation.setLongitude(MainActivity.locations.get(intent.getIntExtra("placeNumber",0)).longitude);
+
+            centerMapOnLocation(placeLocation,MainActivity.places.get(intent.getIntExtra("placeNumber",0)));
+
+
         }
     }
 
@@ -109,6 +117,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         address+=listAddresses.get(0).getSubThoroughfare() + " ";
                     }
                     address+= listAddresses.get(0).getThoroughfare();
+
                 }
             }
         }catch (Exception e){
@@ -118,9 +127,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (address.equals("")){
             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyy-MM-dd");
             address += sdf.format(new Date());
-
         }
             mMap.addMarker(new MarkerOptions().position(latLng).title(address));
 
+        MainActivity.places.add(address);
+        MainActivity.locations.add(latLng);
+
+        MainActivity.arrayAdapter.notifyDataSetChanged();
+
+        Toast.makeText(this,"Location Saved!",Toast.LENGTH_SHORT).show();
     }
 }
